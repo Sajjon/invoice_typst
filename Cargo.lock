@@ -1617,6 +1617,7 @@ dependencies = [
  "chrono",
  "clap",
  "colored",
+ "derive_more",
  "fern",
  "invoice-typst-logic",
  "invoice-typst-render",

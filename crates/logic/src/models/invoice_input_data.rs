@@ -3,12 +3,14 @@ use derive_more::IsVariant;
 use crate::prelude::*;
 
 pub type InputUnpriced = AbstractInput<LineItemsWithoutCost>;
-pub type InputTypstFormat = AbstractInput<LineItemsFlat>;
+pub type DataTypstCompat = AbstractInput<LineItemsFlat>;
 
 /// The items being invoiced this month, either services or expenses.
-#[derive(Clone, Debug, Serialize, Deserialize, IsVariant)]
+#[derive(Clone, Debug, Display, Serialize, Deserialize, IsVariant)]
 pub enum InvoicedItems {
+    #[display("Service {{ days_off: {} }} ", days_off)]
     Service { days_off: u8 },
+    #[display("Expenses: {}", self)]
     Expenses(Vec<ItemWithoutCost>),
 }
 impl MaybeIsExpenses for InvoicedItems {
@@ -63,7 +65,7 @@ fn working_days_in_month(
     Ok(working_days)
 }
 
-impl ProtoInput {
+impl DataFromDisk {
     pub fn to_partial(
         self,
         target_month: &YearAndMonth,
@@ -119,13 +121,13 @@ impl ProtoInput {
 }
 
 impl InputUnpriced {
-    pub fn to_typst(self, exchange_rates_map: ExchangeRatesMap) -> Result<InputTypstFormat> {
+    pub fn to_typst(self, exchange_rates_map: ExchangeRatesMap) -> Result<DataTypstCompat> {
         let exchange_rates = ExchangeRates::builder()
             .rates(exchange_rates_map)
             .target_currency(*self.payment_info().currency())
             .build();
         let line_items = LineItemsFlat::try_from((self.line_items, exchange_rates))?;
-        Ok(InputTypstFormat {
+        Ok(DataTypstCompat {
             line_items,
             information: self.information,
             vendor: self.vendor,
@@ -138,7 +140,7 @@ impl InputUnpriced {
 /// The input data for the invoice, which includes information about the invoice,
 /// the vendor, and the client and the products/services included in the invoice.
 #[derive(Clone, Debug, Serialize, Deserialize, TypedBuilder, Getters)]
-pub struct ProtoInput {
+pub struct DataFromDisk {
     /// Information about this specific invoice.
     #[builder(setter(into))]
     #[getset(get = "pub")]
@@ -386,9 +388,9 @@ impl PaymentInformation {
     }
 }
 
-impl ProtoInput {
+impl DataFromDisk {
     pub fn sample() -> Self {
-        ProtoInput::builder()
+        DataFromDisk::builder()
             .information(ProtoInvoiceInfo::sample())
             .client(CompanyInformation::sample_client())
             .vendor(CompanyInformation::sample_vendor())
@@ -406,6 +408,6 @@ mod tests {
 
     #[test]
     fn test_serialization_sample() {
-        assert_ron_snapshot!(ProtoInput::sample())
+        assert_ron_snapshot!(DataFromDisk::sample())
     }
 }

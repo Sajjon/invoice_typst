@@ -6,10 +6,16 @@ use crate::prelude::*;
 )]
 pub struct Month(u8);
 
+impl From<u8> for Month {
+    fn from(month: u8) -> Self {
+        assert!((1..=12).contains(&month), "Month must be between 1 and 12");
+        Self(month)
+    }
+}
+
 impl From<i32> for Month {
     fn from(month: i32) -> Self {
-        assert!((1..=12).contains(&month), "Month must be between 1 and 12");
-        Self(month as u8)
+        Self::from(month as u8)
     }
 }
 

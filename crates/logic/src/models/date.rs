@@ -77,6 +77,7 @@ impl YearAndMonth {
             _ => unreachable!("Invalid month value"),
         }
     }
+
     pub fn to_date_end_of_month(&self) -> Date {
         Date::builder()
             .year(self.year)
@@ -84,7 +85,38 @@ impl YearAndMonth {
             .day(self.last_day_of_month())
             .build()
     }
+
+    pub fn current() -> Self {
+        use chrono::Datelike;
+        let today = chrono::Local::now().date_naive();
+        Self::builder()
+            .year(Year::from(today.year()))
+            .month(Month::from(today.month() as i32))
+            .build()
+    }
+
+    pub fn one_month_earlier(&self) -> Self {
+        let mut year = *self.year;
+        let mut month = *self.month;
+
+        if month == 1 {
+            year -= 1;
+            month = 12
+        } else {
+            month -= 1
+        }
+
+        Self::builder()
+            .year(Year::from(year))
+            .month(Month::from(month))
+            .build()
+    }
+
+    pub fn last() -> Self {
+        Self::current().one_month_earlier()
+    }
 }
+
 impl PartialOrd for YearAndMonth {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         if self.year > other.year {

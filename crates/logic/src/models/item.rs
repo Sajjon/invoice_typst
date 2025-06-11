@@ -20,7 +20,15 @@ impl ConsultingService {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, Getters, TypedBuilder)]
+#[derive(Clone, Debug, Display, Serialize, Deserialize, Getters, TypedBuilder)]
+#[display(
+    "{}: {}{} #{} @{}",
+    name,
+    unit_price,
+    currency,
+    quantity,
+    transaction_date
+)]
 pub struct ItemWithoutCost {
     /// The date of the expense, e.g. `2025-05-31`
     #[builder(setter(into))]
@@ -57,13 +65,13 @@ pub struct ItemWithCost {
     total_cost: Cost,
 }
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, From, Deref)]
+#[derive(Clone, Copy, Display, Debug, Serialize, Deserialize, From, Deref)]
 pub struct Quantity(f64);
 
-#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, From, Deref)]
+#[derive(Clone, Copy, Display, Debug, Default, Serialize, Deserialize, From, Deref)]
 pub struct Cost(f64);
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, From, Deref)]
+#[derive(Clone, Copy, Display, Debug, Serialize, Deserialize, From, Deref)]
 pub struct UnitPrice(f64);
 
 impl ItemWithoutCost {

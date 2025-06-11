@@ -102,7 +102,7 @@ mod tests {
     #[test]
     fn sample_expenses_to_typst() {
         test_data_to_typst!(
-            ProtoInput::sample(),
+            DataFromDisk::sample(),
             InvoicedItems::Expenses(vec![
                 ItemWithoutCost::sample_expense_breakfast(),
                 ItemWithoutCost::sample_expense_coffee(),
@@ -115,7 +115,7 @@ mod tests {
     #[test]
     fn sample_services_to_typst() {
         test_data_to_typst!(
-            ProtoInput::sample(),
+            DataFromDisk::sample(),
             InvoicedItems::Service { days_off: 0 },
             include_str!("./fixtures/expected_input_services.typ")
         );
