@@ -23,6 +23,8 @@ github-token = "${GITHUB_TOKEN}"
 
 [packages.klirr-render]
 tag-name = ""
+tag = false
 
 [packages.klirr-core]
 tag-name = ""
+tag = false
