@@ -4,8 +4,83 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// Error type for the logic crate, encapsulating various errors that can occur
 /// during PDF generation and manipulation.
-#[derive(Clone, Debug, ThisError)]
+#[derive(Clone, Debug, ThisError, PartialEq)]
 pub enum Error {
+    /// Password does not match, e.g. when the user tries to set a password
+    /// and the confirmation password does not match.
+    #[error("Passwords do not match")]
+    PasswordDoesNotMatch,
+
+    /// Email password is too short.
+    #[error(
+        "Email password is too short, expected at least {min_length} characters, but found {actual_length}"
+    )]
+    EmailPasswordTooShort {
+        /// The minimum length of the email password.
+        min_length: usize,
+        /// The actual length of the email password.
+        actual_length: usize,
+    },
+
+    /// Failed to parse the email atom template, e.g. when the template is not valid.
+    #[error("Failed parse email atom template, because: {underlying}")]
+    EmailAtomTemplateError { underlying: String },
+
+    /// Invalid email address
+    #[error("Invalid email address for: {role}, because: {underlying}")]
+    InvalidEmailAddress { role: String, underlying: String },
+
+    /// Invalid name for email
+    #[error("Invalid name for email for: {role}, because: {underlying}")]
+    InvalidNameForEmail { role: String, underlying: String },
+
+    #[error("Invalid password for email {purpose}, because: {underlying}")]
+    InvalidPasswordForEmail { purpose: String, underlying: String },
+
+    /// Recipient addresses cannot be empty.
+    #[error("Recipient addresses cannot be empty")]
+    RecipientAddressesCannotBeEmpty,
+
+    /// Failed to parse SMTP Server
+    #[error("Failed to parse SMTP Server, because: {underlying}")]
+    InvalidSmtpServer { underlying: String },
+
+    /// Failed to parse a string into a valid UTF-8 string.
+    #[error("Failed to parse string into a valid UTF-8 string")]
+    InvalidUtf8,
+
+    /// Failed to decrypt data with AES.
+    #[error("Failed to decrypt data with AES")]
+    AESDecryptionFailed,
+
+    /// Invalid AES bytes, e.g. when the length is not as expected.
+    #[error(
+        "Invalid AES bytes, expected at least {expected_at_least} bytes, but found {found} bytes"
+    )]
+    InvalidAESBytesTooShort {
+        expected_at_least: usize,
+        found: usize,
+    },
+
+    /// Failed to create SMTP transport, e.g. when the SMTP server is not reachable.
+    #[error("Failed to create SMTP transport, because: {underlying}")]
+    CreateSmtpTransportError { underlying: String },
+
+    /// Failed to create Lettre Email from Email struct.
+    #[error("Failed to create email, because: {underlying}")]
+    CreateEmailError { underlying: String },
+
+    /// Failed to add attachments to the email, e.g. when the file is not found or cannot be read.
+    #[error("Failed to add attachments to the email, because: {underlying}")]
+    AddAttachmentsError {
+        /// Underlying error when adding attachments to the email.
+        underlying: String,
+    },
+
+    /// Failed to send email
+    #[error("Failed to send email, because: {underlying}")]
+    SendEmailError { underlying: String },
+
     /// Failed to convert to `f64` from a `Decimal`
     #[error("Failed to convert to f64 from Decimal, because: {value}")]
     InvalidDecimalToF64Conversion { value: String },
